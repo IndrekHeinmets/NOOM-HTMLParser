@@ -50,7 +50,7 @@ def parse_htm(content, data):
 
 def write_output(filename, data):
     with open(filename, 'w', newline='', encoding='utf-8') as f:
-        writer = csv.DictWriter(f, fieldnames=list(data[0].keys()))
+        writer = csv.DictWriter(f, fieldnames=list(data[1].keys()))
         writer.writeheader()
         writer.writerows(data)
     print(f'Data extracted & saved to {filename} successfully!')
@@ -61,7 +61,7 @@ def main():
     for filename in os.listdir(input_folder_path):
         if filename.endswith('.htm'):
             file_path = os.path.join(input_folder_path, filename)
-            data.append({'NIMETUS': '_', 'SEERIA': '_', 'HIND': str(filename), 'LAOJAAK': '_', 'AEGUMINE': '_'})
+            data.append({'NIMETUS': str(filename[:-4])})
             data = parse_htm(read_htm(file_path), data)
     write_output(output_filename, data)
 
