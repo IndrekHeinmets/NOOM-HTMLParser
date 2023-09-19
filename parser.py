@@ -1,8 +1,9 @@
 from bs4 import BeautifulSoup
-import csv, os
+import csv
+import os
 
 input_folder_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'input_data')
-output_filename = 'output.csv'
+output_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'output.csv')
 
 
 def read_htm(path: str):
@@ -32,16 +33,12 @@ def parse_htm(content: list, data: list, filename: str, error: bool):
 
     for i in range(0, len(entries), 7):
             try:
-                nimetus = entries[i].text.strip().replace(",", ".")
-                seeria = entries[i+1].text.strip().replace(",", ".")
-                hind = entries[i+6].text.strip().replace(",", ".")
-                laojaak = entries[i+2].text.strip().replace(",", ".")
-                aegumine = entries[i+3].text.strip().replace(",", ".")
-                data.append({'NIMETUS': str(nimetus),
-                            'SEERIA': str(seeria),
-                            'HIND': float(hind),
-                            'LAOJAAK': float(laojaak),
-                            'AEGUMINE': str(aegumine)})
+                data.append({'NIMETUS': str(entries[i].text.strip().replace(",", ".")),
+                            'SEERIA': str(entries[i+1].text.strip().replace(",", ".")),
+                            'HIND': float(entries[i+6].text.strip().replace(",", ".")),
+                            'LAOJAAK': float(entries[i+2].text.strip().replace(",", ".")),
+                            'AEGUMINE': str(entries[i+3].text.strip().replace(",", ".")),
+                            'OSAKOND': str(filename[0])})
             except IndexError as Ie:
                 print(f'\nFailed to parse line {i} in "{filename}": {Ie}')
                 error = True
@@ -70,10 +67,9 @@ def main():
     for filename in os.listdir(input_folder_path):
         if any(filename.endswith(ext) for ext in exts):
             file_path = os.path.join(input_folder_path, filename)
-            data.append({'NIMETUS': str(filename[:-4])})
             data, error = parse_htm(read_htm(file_path), data, filename, error)
     if not error:
-        write_output(output_filename, data)
+        write_output(output_file_path, data)
 
 
 if __name__ == '__main__':
