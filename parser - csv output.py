@@ -1,12 +1,9 @@
-from openpyxl.utils import get_column_letter
-from openpyxl import Workbook
 from bs4 import BeautifulSoup
 import csv
 import os
 
 input_folder_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'input_data')
 output_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'output.csv')
-output_format = 'excel' # 'excel' / 'csv'
 
 
 def read_htm(path: str):
@@ -57,40 +54,12 @@ def parse_htm(content: list, data: list, filename: str, error: bool):
     return data, error
 
 
-def write_output(filename: str, data: list, output_format: str = 'csv'):
-    if output_format == 'csv':
-        with open(filename, 'w', newline='', encoding='utf-8') as f:
-            writer = csv.DictWriter(f, fieldnames=list(data[1].keys()))
-            writer.writeheader()
-            writer.writerows(data)
-        print(f'\nData extracted & saved to "{filename}" successfully!')
-    elif output_format == 'excel':
-        wb = Workbook()
-        ws = wb.active
-        ws.append(list(data[1].keys()))
-        for row in data:
-            ws.append(list(row.values()))
-        
-        # Formatting columns
-        for col in ws.columns:
-            column = col[0].column_letter
-            if column == 'A' or column == 'F':  # 'NIMETUS' and 'OSAKOND'
-                for cell in col:
-                    cell.number_format = '@'  # text format
-            elif column == 'B':  # 'SEERIA'
-                for cell in col:
-                    cell.number_format = 'General'
-            elif column == 'C' or column == 'D':  # 'HIND' and 'LAOJAAK'
-                for cell in col:
-                    cell.number_format = '0.00'  # number format
-            elif column == 'E':  # 'AEGUMINE'
-                for cell in col:
-                    cell.number_format = 'mm-dd-yy'  # date format
-
-        wb.save(filename)
-        print(f'\nData extracted & saved to "{filename}" successfully!')
-    else:
-        print(f'\nInvalid output format: "{output_format}"')
+def write_output(filename: str, data: list):
+    with open(filename, 'w', newline='', encoding='utf-8') as f:
+        writer = csv.DictWriter(f, fieldnames=list(data[1].keys()))
+        writer.writeheader()
+        writer.writerows(data)
+    print(f'\nData extracted & saved to "{filename}" successfully!')
 
 
 def main():
@@ -100,7 +69,7 @@ def main():
             file_path = os.path.join(input_folder_path, filename)
             data, error = parse_htm(read_htm(file_path), data, filename, error)
     if not error:
-        write_output(output_file_path, data, output_format)
+        write_output(output_file_path, data)
 
 
 if __name__ == '__main__':
