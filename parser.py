@@ -21,8 +21,8 @@ def limit_entries(raw_entries: list, start_lim: str, end_lim: str):
             if end_index is not None:
                 limits.append((start_index + 1, end_index - 3))
 
-    for limits in limits:
-        start_index, end_index = limits
+    for limit in limits:
+        start_index, end_index = limit
         entries.extend(raw_entries[start_index:end_index])
     return entries
 
